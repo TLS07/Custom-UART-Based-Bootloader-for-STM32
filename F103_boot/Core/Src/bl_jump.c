@@ -17,11 +17,11 @@ void JumpToApplication(void)
     uint32_t appResetHandler;
     pFunction appEntry;
 
-    /* Read application stack pointer */
+    /* Read application msp */
     appStack = *(volatile uint32_t*)APP_START_ADDR;
 
 
-    /* Read reset handler address */
+    /* Read reset handler address  */
     appResetHandler = *(volatile uint32_t*)(APP_START_ADDR + 4);
     appEntry = (pFunction)appResetHandler;
 
