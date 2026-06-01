@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_it.h"
+extern UART_HandleTypeDef huart2;
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -84,6 +85,7 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
+	HAL_UART_Transmit(&huart2, (uint8_t*)"Inside the hard fualt handler", 50, 100);
 
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
