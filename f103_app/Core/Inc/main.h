@@ -32,6 +32,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include"flash_layout.h"
+#include"app_header.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

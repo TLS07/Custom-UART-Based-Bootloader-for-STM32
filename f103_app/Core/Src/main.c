@@ -56,6 +56,14 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+__attribute__((section(".header"))) const app_header_t app_header =
+{
+	.ota_flag    = 0,
+    .magic_key   = 0x1ABCDEF0,
+    .size        = 0,
+    .crc         = 0,
+    .version     = 0
+};
 
 /* USER CODE END 0 */
 
@@ -91,6 +99,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  HAL_UART_Transmit(&huart2,(uint8_t*)"veryfication of the application succes ..\r\n", strlen("veryfication of the application succes ..\r\n"),100);
   HAL_UART_Transmit(&huart2,(uint8_t*)"Inside the application\r\n", strlen("Inside the application\r\n"),100);
 
   /* USER CODE END 2 */

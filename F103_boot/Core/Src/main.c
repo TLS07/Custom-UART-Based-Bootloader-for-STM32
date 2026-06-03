@@ -91,8 +91,18 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  HAL_UART_Transmit(&huart2, (uint8_t*)"veryfing application ... \r\n", strlen("veryfing application ... \r\n"), 100);
 
-
+  if (bootloader_is_app_valid() != 0)
+    {
+  	  HAL_UART_Transmit(&huart2, (uint8_t *)"applcaition verification failed !!\r\n", strlen("applcaition verification failed !!\r\n"), 100);
+  	  HAL_UART_Transmit(&huart2, (uint8_t *)"aborting jump to the application  !!\r\n", strlen("aborting jump to the application  !!\r\n"), 100);
+  	  while (1)
+  	  {
+  		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+  		  HAL_Delay(100);
+  	  }
+    }
   JumpToApplication();
   HAL_UART_Transmit(&huart2, (uint8_t*)"Failed to load application\r\n", strlen("Failed to load application\r\n"), 100);
   /* USER CODE END 2 */

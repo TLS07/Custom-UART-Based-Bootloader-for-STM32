@@ -32,7 +32,9 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 void JumpToApplication(void);
+int bootloader_is_app_valid(void);
 #include "flash_layout.h"
+#include "app_header.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
