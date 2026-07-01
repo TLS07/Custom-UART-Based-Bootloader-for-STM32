@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "string.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -91,7 +91,30 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  Bootloader_UpdateMode();
+
+
+#if 0
+  //promtping message whether to update the firmware or not
+  uint8_t update=0;
+  HAL_UART_Transmit(&huart2, (uint8_t*)"Press U to enter firmware update mode withing 3 sec for update\r\n"
+		  	  	  	  , strlen("Press U to enter firmware update mode withing 3 sec for update\r\n"), 100);
+
+  if(HAL_UART_Receive(&huart2, &update, 1, 3000)==HAL_OK)
+  {
+	  if(update=='U'||update=='u')
+	  {
+		  HAL_UART_Transmit(&huart2, (uint8_t*)"UPDATE MODE\r\n", strlen("UPDATE MODE\r\n"), 100);
+		  Bootloader_UpdateMode();
+	  }
+  }
+
+
   HAL_UART_Transmit(&huart2, (uint8_t*)"veryfing application ... \r\n", strlen("veryfing application ... \r\n"), 100);
+
+#endif
+
+#if 0
 
   if (bootloader_is_app_valid() != 0)
     {
@@ -105,6 +128,8 @@ int main(void)
     }
   JumpToApplication();
   HAL_UART_Transmit(&huart2, (uint8_t*)"Failed to load application\r\n", strlen("Failed to load application\r\n"), 100);
+
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */

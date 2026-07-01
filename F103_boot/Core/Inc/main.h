@@ -31,8 +31,18 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <string.h>
+#include <stdio.h>
+
+typedef enum
+{
+	BL_OK=0,
+	BL_ERROR
+}BL_Status_t;
+
 void JumpToApplication(void);
 int bootloader_is_app_valid(void);
+void Bootloader_UpdateMode(void);
 #include "flash_layout.h"
 #include "app_header.h"
 /* USER CODE END Includes */

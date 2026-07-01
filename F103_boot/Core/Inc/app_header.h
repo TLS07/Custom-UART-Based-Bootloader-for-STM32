@@ -8,6 +8,8 @@
 #ifndef INC_APP_HEADER_H_
 #define INC_APP_HEADER_H_
 
+
+#define  APP_MAGIC 	0x1ABCDEF0
 typedef struct
 {
 	uint32_t ota_flag;
