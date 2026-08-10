@@ -1,0 +1,5 @@
+../Core/Src/firware_update.c:22:6:Bootloader_UpdateMode	7
+../Core/Src/firware_update.c:109:13:Bootloader_validation_header	4
+../Core/Src/firware_update.c:156:14:Bootloader_EraseApplication	2
+../Core/Src/firware_update.c:192:13:Bootloader_ReceiveFirmware	5
+../Core/Src/firware_update.c:261:13:Bootloader_WriteChunk	4
