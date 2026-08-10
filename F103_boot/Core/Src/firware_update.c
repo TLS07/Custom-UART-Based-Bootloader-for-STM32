@@ -94,9 +94,24 @@ void Bootloader_UpdateMode(void)
 
                     /* Firmware transfer completed */
                     HAL_UART_Transmit(&huart2,
-                                      (uint8_t *)"UPDATE COMPLETE\r\n",
-                                      strlen("UPDATE COMPLETE\r\n"),
+                    			(uint8_t *)"UPDATE COMPLETE\r\n",
+								strlen("UPDATE COMPLETE\r\n"),
+								100);
+
+
+                    /* Verify firmware CRC */
+                    if (Bootloader_VerifyFirmwareCRC(&rx_header) != BL_OK)
+                    {
+                        continue;
+                    }
+
+                    HAL_UART_Transmit(&huart2,
+                                      (uint8_t *)"CRC OK - STARTING APPLICATION\r\n",
+                                      strlen("CRC OK - STARTING APPLICATION\r\n"),
                                       100);
+
+
+
                 }
             }
         }
@@ -254,6 +269,8 @@ BL_Status_t Bootloader_ReceiveFirmware(const app_header_t *header)
                       strlen("FIRMWARE RECEIVED\r\n"),
                       100);
 
+    //to calculte the
+
     return BL_OK;
 }
 
@@ -292,6 +309,32 @@ BL_Status_t Bootloader_WriteChunk(uint32_t flash_address,
     }
 
     HAL_FLASH_Lock();
+
+    return BL_OK;
+}
+
+
+BL_Status_t Bootloader_VerifyFirmwareCRC(const app_header_t *header)
+{
+    uint32_t calculated_crc;
+
+    calculated_crc = Bootloader_CalculateCRC(APP_START_ADDR,
+                                             header->size);
+
+    if (calculated_crc != header->crc)
+    {
+        HAL_UART_Transmit(&huart2,
+                          (uint8_t *)"CRC FAILED\r\n",
+                          strlen("CRC FAILED\r\n"),
+                          100);
+
+        return BL_ERROR;
+    }
+
+    HAL_UART_Transmit(&huart2,
+                      (uint8_t *)"CRC OK\r\n",
+                      strlen("CRC OK\r\n"),
+                      100);
 
     return BL_OK;
 }

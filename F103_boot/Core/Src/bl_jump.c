@@ -17,12 +17,12 @@ void JumpToApplication(void)
     uint32_t appResetHandler;
     pFunction appEntry;
 
-    /* Read application msp */
-    appStack = *(volatile uint32_t*)APP_START_ADDR;
+    /* Read application MSP */
+    appStack = *(volatile uint32_t *)APP_START_ADDR;
 
+    /* Read application Reset_Handler */
+    appResetHandler = *(volatile uint32_t *)(APP_START_ADDR + 4U);
 
-    /* Read reset handler address  */
-    appResetHandler = *(volatile uint32_t*)(APP_START_ADDR + 4);
     appEntry = (pFunction)appResetHandler;
 
     /* Disable interrupts */
@@ -33,11 +33,18 @@ void JumpToApplication(void)
     SysTick->LOAD = 0;
     SysTick->VAL  = 0;
 
-    /* Set main stack pointer */
+    /* Set application's stack pointer */
     __set_MSP(appStack);
 
-    /* Jump to application reset handler */
+    /* Jump to application */
     appEntry();
+
+    /* If execution comes back here, jump failed */
+    while (1)
+    {
+        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+        HAL_Delay(500);
+    }
 }
 
 
@@ -66,3 +73,29 @@ int bootloader_is_app_valid(void)
     return 0;
 }
 
+
+uint32_t Bootloader_CalculateCRC(uint32_t start_address, uint32_t length)
+{
+    uint32_t crc = 0xFFFFFFFFU;
+
+    uint8_t *data = (uint8_t *)start_address;
+
+    for (uint32_t i = 0; i < length; i++)
+    {
+        crc ^= data[i];
+
+        for (uint8_t bit = 0; bit < 8; bit++)
+        {
+            if (crc & 1U)
+            {
+                crc = (crc >> 1) ^ 0xEDB88320U;
+            }
+            else
+            {
+                crc >>= 1;
+            }
+        }
+    }
+
+    return crc ^ 0xFFFFFFFFU;
+}
