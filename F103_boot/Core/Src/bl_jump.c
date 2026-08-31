@@ -10,36 +10,100 @@
 
 #define  APP_MAGIC 	0x1ABCDEF0
 typedef void (*pFunction)(void);
+extern UART_HandleTypeDef huart2;
 
 void JumpToApplication(void)
 {
     uint32_t appStack;
     uint32_t appResetHandler;
     pFunction appEntry;
+    char buff[100];
+
+//    HAL_UART_Transmit(&huart2,
+//                      (uint8_t *)"JUMP: Entered JumpToApplication\r\n",
+//                      strlen("JUMP: Entered JumpToApplication\r\n"),
+//                      100);
 
     /* Read application MSP */
     appStack = *(volatile uint32_t *)APP_START_ADDR;
 
+    sprintf(buff,
+            "JUMP: MSP = 0x%08lX\r\n",
+            (unsigned long)appStack);
+
+    HAL_UART_Transmit(&huart2,
+                      (uint8_t *)buff,
+                      strlen(buff),
+                      100);
+
     /* Read application Reset_Handler */
     appResetHandler = *(volatile uint32_t *)(APP_START_ADDR + 4U);
 
+    sprintf(buff,
+            "JUMP: RESET_HANDLER = 0x%08lX\r\n",
+            (unsigned long)appResetHandler);
+
+    HAL_UART_Transmit(&huart2,
+                      (uint8_t *)buff,
+                      strlen(buff),
+                      100);
+
+    /* Store application entry address */
     appEntry = (pFunction)appResetHandler;
 
+//    HAL_UART_Transmit(&huart2,
+//                      (uint8_t *)"JUMP: Entry address loaded\r\n",
+//                      strlen("JUMP: Entry address loaded\r\n"),
+//                      100);
+
     /* Disable interrupts */
+//    HAL_UART_Transmit(&huart2,
+//                      (uint8_t *)"JUMP: Disabling IRQ\r\n",
+//                      strlen("JUMP: Disabling IRQ\r\n"),
+//                      100);
+
     __disable_irq();
 
     /* Stop SysTick */
+//    HAL_UART_Transmit(&huart2,
+//                      (uint8_t *)"JUMP: Stopping SysTick\r\n",
+//                      strlen("JUMP: Stopping SysTick\r\n"),
+//                      100);
+
     SysTick->CTRL = 0;
     SysTick->LOAD = 0;
     SysTick->VAL  = 0;
 
+    /* Set application's vector table */
+//    HAL_UART_Transmit(&huart2,
+//                      (uint8_t *)"JUMP: Setting VTOR\r\n",
+//                      strlen("JUMP: Setting VTOR\r\n"),
+//                      100);
+
+    SCB->VTOR = APP_START_ADDR;
+
     /* Set application's stack pointer */
+//    HAL_UART_Transmit(&huart2,
+//                      (uint8_t *)"JUMP: Setting MSP\r\n",
+//                      strlen("JUMP: Setting MSP\r\n"),
+//                      100);
+
     __set_MSP(appStack);
 
     /* Jump to application */
+    HAL_UART_Transmit(&huart2,
+                      (uint8_t *)"JUMP: Calling application Reset_Handler\r\n",
+                      strlen("JUMP: Calling application Reset_Handler\r\n"),
+                      100);
+
     appEntry();
 
     /* If execution comes back here, jump failed */
+    HAL_UART_Transmit(&huart2,
+                      (uint8_t *)"JUMP: Returned from application!\r\n",
+                      strlen("JUMP: Returned from application!\r\n"),
+                      100);
+
     while (1)
     {
         HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
@@ -48,54 +112,6 @@ void JumpToApplication(void)
 }
 
 
-//fucntion to validate the application code is valid
-int bootloader_is_app_valid(void)
-{
-    uint32_t HDR_ADDR = APP_HEADER_ADDR;
-
-    const app_header_t *app_hdr =
-            (const app_header_t*)HDR_ADDR;
-
-    /* Check magic number */
-    if(app_hdr->magic_key != APP_MAGIC)
-    {
-        return 1;
-    }
-
-    /* Check reset handler */
-    uint32_t reset_handler =*(uint32_t*)(APP_START_ADDR + 4);
-
-    if((reset_handler & 0xFF000000) != 0x08000000)
-    {
-        return 2;
-    }
-
-    return 0;
-}
 
 
-uint32_t Bootloader_CalculateCRC(uint32_t start_address, uint32_t length)
-{
-    uint32_t crc = 0xFFFFFFFFU;
 
-    uint8_t *data = (uint8_t *)start_address;
-
-    for (uint32_t i = 0; i < length; i++)
-    {
-        crc ^= data[i];
-
-        for (uint8_t bit = 0; bit < 8; bit++)
-        {
-            if (crc & 1U)
-            {
-                crc = (crc >> 1) ^ 0xEDB88320U;
-            }
-            else
-            {
-                crc >>= 1;
-            }
-        }
-    }
-
-    return crc ^ 0xFFFFFFFFU;
-}

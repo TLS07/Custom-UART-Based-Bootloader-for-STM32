@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -41,6 +40,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+IWDG_HandleTypeDef hiwdg;
+
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -51,6 +52,7 @@ UART_HandleTypeDef huart2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -90,11 +92,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+
   /* USER CODE BEGIN 2 */
-  Bootloader_UpdateMode();
+  
 
 
-#if 0
+#if 1
   //promtping message whether to update the firmware or not
   uint8_t update=0;
   HAL_UART_Transmit(&huart2, (uint8_t*)"Press U to enter firmware update mode withing 3 sec for update\r\n"
@@ -102,6 +105,8 @@ int main(void)
 
   if(HAL_UART_Receive(&huart2, &update, 1, 3000)==HAL_OK)
   {
+	  MX_IWDG_Init();
+	  HAL_IWDG_Refresh(&hiwdg);
 	  if(update=='U'||update=='u')
 	  {
 		  HAL_UART_Transmit(&huart2, (uint8_t*)"UPDATE MODE\r\n", strlen("UPDATE MODE\r\n"), 100);
@@ -110,32 +115,41 @@ int main(void)
   }
 
 
+
   HAL_UART_Transmit(&huart2, (uint8_t*)"veryfing application ... \r\n", strlen("veryfing application ... \r\n"), 100);
 
+   int app_status = bootloader_is_app_valid();
+
+   if (app_status == 0)
+   {
+       HAL_UART_Transmit(&huart2, (uint8_t*)"APPLICATION VALID - JUMPING\r\n", strlen("APPLICATION VALID - JUMPING\r\n"), 100);
+       JumpToApplication();
+   }
+   else
+   {
+       char msg[60];
+       sprintf(msg, "NO VALID APPLICATION (code %d) - staying in bootloader\r\n", app_status);
+       HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 100);
+   }
+
+//
+//  HAL_UART_Transmit(&huart2, (uint8_t*)"veryfing application ... \r\n", strlen("veryfing application ... \r\n"), 100);
+//  JumpToApplication();
+
 #endif
 
-#if 0
 
-  if (bootloader_is_app_valid() != 0)
-    {
-  	  HAL_UART_Transmit(&huart2, (uint8_t *)"applcaition verification failed !!\r\n", strlen("applcaition verification failed !!\r\n"), 100);
-  	  HAL_UART_Transmit(&huart2, (uint8_t *)"aborting jump to the application  !!\r\n", strlen("aborting jump to the application  !!\r\n"), 100);
-  	  while (1)
-  	  {
-  		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
-  		  HAL_Delay(100);
-  	  }
-    }
-  JumpToApplication();
-  HAL_UART_Transmit(&huart2, (uint8_t*)"Failed to load application\r\n", strlen("Failed to load application\r\n"), 100);
-
-#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if (hiwdg.Instance != NULL)
+	  	  {
+		      HAL_IWDG_Refresh(&hiwdg);
+		  }
+
 	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
 	  HAL_Delay(1000);
     /* USER CODE END WHILE */
@@ -157,9 +171,10 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -179,6 +194,34 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief IWDG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_64;
+  hiwdg.Init.Reload = 4095;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
+
 }
 
 /**

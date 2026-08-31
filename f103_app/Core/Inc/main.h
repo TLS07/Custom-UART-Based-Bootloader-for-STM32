@@ -33,6 +33,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include"flash_layout.h"
 #include"app_header.h"
+#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -55,6 +56,8 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
+int bootloader_is_app_valid(void);
+uint32_t Bootloader_CalculateCRC(uint32_t start_address, uint32_t length);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

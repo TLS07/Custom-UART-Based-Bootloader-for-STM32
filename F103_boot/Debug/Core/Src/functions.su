@@ -1,0 +1,6 @@
+../Core/Src/functions.c:13:13:Bootloader_EraseApplication	32	static
+../Core/Src/functions.c:99:13:Bootloader_WriteChunk	24	static
+../Core/Src/functions.c:47:13:Bootloader_ReceiveFirmware	272	static
+../Core/Src/functions.c:138:13:Bootloader_VerifyFirmwareCRC	72	static
+../Core/Src/functions.c:164:13:Bootloader_EraseHeader	40	static
+../Core/Src/functions.c:188:13:Bootloader_WriteHeader	8	static

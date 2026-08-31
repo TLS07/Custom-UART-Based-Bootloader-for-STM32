@@ -1,0 +1,6 @@
+../Core/Src/functions.c:13:13:Bootloader_EraseApplication	2
+../Core/Src/functions.c:99:13:Bootloader_WriteChunk	4
+../Core/Src/functions.c:47:13:Bootloader_ReceiveFirmware	4
+../Core/Src/functions.c:138:13:Bootloader_VerifyFirmwareCRC	2
+../Core/Src/functions.c:164:13:Bootloader_EraseHeader	2
+../Core/Src/functions.c:188:13:Bootloader_WriteHeader	2

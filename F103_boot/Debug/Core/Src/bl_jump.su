@@ -1,2 +1,1 @@
-../Core/Src/bl_jump.c:14:6:JumpToApplication	24	static,ignoring_inline_asm
-../Core/Src/bl_jump.c:45:5:bootloader_is_app_valid	24	static
+../Core/Src/bl_jump.c:15:6:JumpToApplication	120	static,ignoring_inline_asm

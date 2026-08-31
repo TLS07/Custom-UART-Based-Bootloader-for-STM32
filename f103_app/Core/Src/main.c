@@ -18,7 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include"string.h"
+#include <string.h>
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -56,14 +57,14 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-__attribute__((section(".header"))) const app_header_t app_header =
-{
-	.ota_flag    = 0,
-    .magic_key   = 0x1ABCDEF0,
-    .size        = 0,
-    .crc         = 0,
-    .version     = 0
-};
+// __attribute__((section(".header"))) const app_header_t app_header =
+// {
+// 	.ota_flag    = 0,
+//     .magic_key   = 0x1ABCDEF0,
+//     .size        = 0,
+//     .crc         = 0,
+//     .version     = 0
+// };
 
 /* USER CODE END 0 */
 
@@ -84,7 +85,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  SCB->VTOR = APP_START_ADDR;
+  //SCB->VTOR = APP_START_ADDR;
   __enable_irq();
   /* USER CODE END Init */
 
@@ -99,17 +100,27 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Transmit(&huart2,(uint8_t*)"veryfication of the application succes ..\r\n", strlen("veryfication of the application succes ..\r\n"),100);
-  HAL_UART_Transmit(&huart2,(uint8_t*)"Inside the application\r\n", strlen("Inside the application\r\n"),100);
+//  HAL_UART_Transmit(&huart2,(uint8_t*)"veryfication of the application succes  test..\r\n", strlen("veryfication of the application succes test..\r\n"),100);
+//  HAL_UART_Transmit(&huart2,(uint8_t*)"Inside the application\r\n", strlen("Inside the application\r\n"),100);
 
+
+  HAL_UART_Transmit(&huart2,
+                    (uint8_t *)"Verification of the application success test..\r\n",
+                    sizeof("Verification of the application success test..\r\n") - 1,
+                    100);
+
+  HAL_UART_Transmit(&huart2,
+                    (uint8_t *)"Inside the application\r\n",
+                    sizeof("Inside the application\r\n") - 1,
+                    100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
-	  HAL_Delay(1000);
+	  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	  HAL_Delay(200);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -202,18 +213,19 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PA11 */
-  GPIO_InitStruct.Pin = GPIO_PIN_11;
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
